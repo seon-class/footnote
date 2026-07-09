@@ -1,0 +1,727 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>시카고 스타일 각주·참고문헌 생성기</title>
+  <style>
+    :root {
+      --bg: #f7f4ee;
+      --panel: #fffaf2;
+      --text: #22201c;
+      --muted: #70695f;
+      --line: #ddd3c4;
+      --accent: #2f6f62;
+      --accent-dark: #24564c;
+      --warn: #8a4b18;
+      --shadow: 0 18px 45px rgba(62, 48, 27, .12);
+      font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        linear-gradient(135deg, rgba(47, 111, 98, .08), transparent 34rem),
+        var(--bg);
+    }
+
+    main {
+      width: min(1220px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 34px 0 42px;
+    }
+
+    header {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      max-width: 880px;
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 1rem;
+    }
+
+    .guide-link {
+      width: fit-content;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      background: #fffdf8;
+      color: var(--accent-dark);
+      padding: 10px 13px;
+      text-decoration: none;
+      font-weight: 800;
+    }
+
+    .guide-link:hover,
+    .guide-link:focus {
+      background: var(--accent);
+      color: #fff;
+      outline: none;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(340px, .92fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      background: rgba(255, 250, 242, .94);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .form-panel {
+      padding: 20px;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .tab {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fffdf8;
+      color: var(--muted);
+      cursor: pointer;
+      min-height: 44px;
+      font: inherit;
+      font-weight: 700;
+    }
+
+    .tab[aria-selected="true"] {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .section-title {
+      margin: 0 0 14px;
+      font-size: 1.15rem;
+    }
+
+    .fields {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: #3f3a33;
+      font-size: .93rem;
+      font-weight: 700;
+    }
+
+    input {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--text);
+      padding: 11px 12px;
+      font: inherit;
+      line-height: 1.4;
+    }
+
+    input:focus,
+    .tab:focus {
+      outline: 3px solid rgba(47, 111, 98, .24);
+      border-color: var(--accent);
+    }
+
+    .span-2 {
+      grid-column: 1 / -1;
+    }
+
+    .hint {
+      margin: 14px 0 0;
+      color: var(--muted);
+      font-size: .9rem;
+      line-height: 1.6;
+    }
+
+    .result-panel {
+      position: sticky;
+      top: 18px;
+      overflow: hidden;
+    }
+
+    .result-block {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .result-block:last-child {
+      border-bottom: 0;
+    }
+
+    .result-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .result-head h2 {
+      margin: 0 0 6px;
+      font-size: 1.15rem;
+    }
+
+    .result-head p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: .9rem;
+    }
+
+    .output {
+      min-height: 126px;
+      display: flex;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 16px;
+      font-size: 1rem;
+      line-height: 1.75;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+
+    .bibliography-output {
+      min-height: 146px;
+      align-items: start;
+    }
+
+    .empty {
+      color: var(--muted);
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    button.action {
+      min-height: 42px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 800;
+    }
+
+    button.secondary {
+      background: #fffdf8;
+      color: var(--accent-dark);
+    }
+
+    .notes {
+      padding: 16px 20px 20px;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: .9rem;
+    }
+
+    .notes strong {
+      color: var(--warn);
+    }
+
+    .toast {
+      min-height: 22px;
+      margin-top: 10px;
+      color: var(--accent-dark);
+      font-size: .9rem;
+      font-weight: 700;
+    }
+
+    @media (max-width: 940px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .result-panel {
+        position: static;
+      }
+    }
+
+    @media (max-width: 680px) {
+      main {
+        width: min(100% - 20px, 1220px);
+        padding-top: 22px;
+      }
+
+      .tabs,
+      .fields,
+      .actions {
+        grid-template-columns: 1fr;
+      }
+
+      .span-2 {
+        grid-column: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>시카고 스타일 각주·참고문헌 생성기</h1>
+      <p class="subtitle">단행본, 학술논문, 학위논문, 신문 자료, 기타 자료의 서지 사항을 입력하면 Notes and Bibliography 방식의 첫 각주와 참고문헌 항목을 함께 만들어 줍니다. 한국어 과제 작성에 맞춰 꺾쇠표와 낫표를 사용하되, 시카고식 정보 배열을 따르도록 구성했습니다.</p>
+      <a class="guide-link" href="chicago-style-footnote-guide.html" target="_blank" rel="noopener">시카고 스타일 각주 작성 지침 보기</a>
+    </header>
+
+    <section class="layout" aria-label="각주와 참고문헌 생성 도구">
+      <div class="panel form-panel">
+        <nav class="tabs" aria-label="자료 유형">
+          <button class="tab" type="button" data-type="book" aria-selected="true">단행본</button>
+          <button class="tab" type="button" data-type="article" aria-selected="false">학술논문</button>
+          <button class="tab" type="button" data-type="thesis" aria-selected="false">학위논문</button>
+          <button class="tab" type="button" data-type="newspaper" aria-selected="false">신문 자료</button>
+          <button class="tab" type="button" data-type="other" aria-selected="false">기타 자료</button>
+        </nav>
+
+        <h2 class="section-title" id="formTitle">단행본 서지 사항</h2>
+        <form id="citationForm" autocomplete="off">
+          <div class="fields" id="fields"></div>
+        </form>
+        <p class="hint" id="typeHint"></p>
+      </div>
+
+      <aside class="panel result-panel">
+        <div class="result-block">
+          <div class="result-head">
+            <div>
+              <h2>생성된 각주</h2>
+              <p>인용한 실제 쪽수나 URL을 확인한 뒤 각주 칸에 붙여 넣으세요.</p>
+            </div>
+          </div>
+          <div class="output empty" id="footnoteOutput">왼쪽에 서지 사항을 입력하면 각주가 표시됩니다.</div>
+        </div>
+
+        <div class="result-block">
+          <div class="result-head">
+            <div>
+              <h2>생성된 참고문헌</h2>
+              <p>참고문헌 목록에는 보통 인용한 특정 쪽수가 아니라 자료 전체의 정보를 적습니다.</p>
+            </div>
+          </div>
+          <div class="output bibliography-output empty" id="bibliographyOutput">왼쪽에 서지 사항을 입력하면 참고문헌 항목이 표시됩니다.</div>
+          <div class="actions">
+            <button class="action" type="button" id="copyFootnoteBtn">각주 복사</button>
+            <button class="action" type="button" id="copyBibliographyBtn">참고문헌 복사</button>
+            <button class="action secondary" type="button" id="exampleBtn">예시 입력</button>
+            <button class="action secondary" type="button" id="clearBtn">지우기</button>
+          </div>
+          <div class="toast" id="toast" aria-live="polite"></div>
+        </div>
+
+        <div class="notes">
+          <strong>확인할 점:</strong> 이 도구는 각주와 참고문헌 형식 초안을 만듭니다. 번역서, 편저 수록 논문, 재인용, 저자가 많은 공동 연구, 온라인 DB 수록 자료처럼 특수한 경우에는 교수자 지침과 원문 서지 정보를 한 번 더 확인하세요.
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const sourceTypes = {
+      book: {
+        title: "단행본 서지 사항",
+        hint: "각주: 저자, 『책 제목』 (출판지: 출판사, 연도), 쪽수. 참고문헌: 저자. 『책 제목』. 출판지: 출판사, 연도.",
+        fields: [
+          ["author", "저자", "예: 김영민"],
+          ["title", "책 제목", "예: 공부란 무엇인가"],
+          ["place", "출판지", "예: 서울"],
+          ["publisher", "출판사", "예: 어크로스"],
+          ["year", "출판연도", "예: 2020"],
+          ["pages", "인용 쪽수", "예: 45-47"]
+        ],
+        example: {
+          author: "김영민",
+          title: "공부란 무엇인가",
+          place: "서울",
+          publisher: "어크로스",
+          year: "2020",
+          pages: "45-47"
+        }
+      },
+      article: {
+        title: "학술논문 서지 사항",
+        hint: "각주에는 인용 쪽수를, 참고문헌에는 논문 전체 쪽수 범위를 넣는 것이 좋습니다. DOI가 있으면 URL보다 DOI를 우선 입력하세요.",
+        fields: [
+          ["author", "저자", "예: 홍길동"],
+          ["title", "논문 제목", "예: 대학 글쓰기 교육의 방향"],
+          ["journal", "학술지명", "예: 교양교육연구"],
+          ["volume", "권", "예: 18"],
+          ["issue", "호", "예: 2"],
+          ["year", "발행연도", "예: 2024"],
+          ["pages", "인용 쪽수", "예: 112"],
+          ["pageRange", "논문 전체 쪽수", "예: 101-125"],
+          ["doi", "DOI 또는 URL", "예: https://doi.org/10.xxxx/xxxxx"]
+        ],
+        example: {
+          author: "홍길동",
+          title: "대학 글쓰기 교육의 방향",
+          journal: "교양교육연구",
+          volume: "18",
+          issue: "2",
+          year: "2024",
+          pages: "112",
+          pageRange: "101-125",
+          doi: "https://doi.org/10.46392/kjge.2024.18.2.101"
+        }
+      },
+      thesis: {
+        title: "학위논문 서지 사항",
+        hint: "각주: 저자, 「논문 제목」 (학위논문, 대학명, 연도), 쪽수. 참고문헌에서는 문장형으로 정리합니다.",
+        fields: [
+          ["author", "저자", "예: 이서연"],
+          ["title", "논문 제목", "예: 한국 현대소설의 도시 표상 연구"],
+          ["degree", "학위 종류", "예: 석사학위논문"],
+          ["university", "대학명", "예: 한국대학교"],
+          ["year", "수여연도", "예: 2023"],
+          ["pages", "인용 쪽수", "예: 28-30"],
+          ["url", "URL", "예: https://www.riss.kr/link?id=T..."]
+        ],
+        example: {
+          author: "이서연",
+          title: "한국 현대소설의 도시 표상 연구",
+          degree: "석사학위논문",
+          university: "한국대학교",
+          year: "2023",
+          pages: "28-30",
+          url: "https://www.riss.kr/link?id=T000000000"
+        }
+      },
+      newspaper: {
+        title: "신문 자료 서지 사항",
+        hint: "신문 기사와 온라인 뉴스는 기자명, 기사 제목, 매체명, 발행일, 쪽수 또는 URL 순으로 정리합니다. 참고문헌에는 보통 특정 쪽수를 생략합니다.",
+        fields: [
+          ["author", "기자/작성자", "예: 박민지"],
+          ["title", "기사 제목", "예: 대학가 글쓰기 교육 강화 움직임"],
+          ["newspaper", "신문/매체명", "예: 한겨레"],
+          ["date", "발행일", "예: 2026. 7. 8."],
+          ["pages", "지면 쪽수", "예: 12"],
+          ["url", "URL 또는 DB명", "예: https://www.hani.co.kr/..."]
+        ],
+        example: {
+          author: "박민지",
+          title: "대학가 글쓰기 교육 강화 움직임",
+          newspaper: "한겨레",
+          date: "2026. 7. 8.",
+          pages: "12",
+          url: "https://www.hani.co.kr/"
+        }
+      },
+      other: {
+        title: "기타 자료 서지 사항",
+        hint: "웹페이지, 보고서, 기관 자료 등에 쓸 수 있는 범용 형식입니다. 작성일이 없으면 접속일을 꼭 입력하세요.",
+        fields: [
+          ["author", "작성자/기관", "예: 통계청"],
+          ["title", "자료 제목", "예: 2025 청소년 통계"],
+          ["container", "사이트명/발행기관", "예: 통계청"],
+          ["date", "작성일/발행일", "예: 2025. 5. 1."],
+          ["accessed", "접속일", "예: 2026. 7. 8."],
+          ["url", "URL", "예: https://kostat.go.kr/..."]
+        ],
+        example: {
+          author: "통계청",
+          title: "2025 청소년 통계",
+          container: "통계청",
+          date: "2025. 5. 1.",
+          accessed: "2026. 7. 8.",
+          url: "https://kostat.go.kr/"
+        }
+      }
+    };
+
+    const state = {
+      type: "book",
+      values: {}
+    };
+
+    const fieldsEl = document.querySelector("#fields");
+    const footnoteOutputEl = document.querySelector("#footnoteOutput");
+    const bibliographyOutputEl = document.querySelector("#bibliographyOutput");
+    const formTitleEl = document.querySelector("#formTitle");
+    const typeHintEl = document.querySelector("#typeHint");
+    const toastEl = document.querySelector("#toast");
+
+    function clean(value) {
+      return (value || "").trim().replace(/\s+/g, " ");
+    }
+
+    function titleMarks(title, kind) {
+      const value = clean(title);
+      if (!value) return "";
+      if (kind === "book" || kind === "journal") return `『${value}』`;
+      return `「${value}」`;
+    }
+
+    function pagePart(pages) {
+      const value = clean(pages);
+      return value ? `, ${value}쪽` : "";
+    }
+
+    function compact(parts, separator = ", ") {
+      return parts.filter(Boolean).join(separator);
+    }
+
+    function sentence(text) {
+      const value = clean(text);
+      if (!value) return "";
+      return /[.!?。]$/.test(value) ? value : `${value}.`;
+    }
+
+    function publicationInfo(v) {
+      const placePublisher = clean(v.place) && clean(v.publisher)
+        ? `${clean(v.place)}: ${clean(v.publisher)}`
+        : compact([clean(v.place), clean(v.publisher)]);
+      return compact([placePublisher, clean(v.year)]);
+    }
+
+    function articleIssue(v) {
+      return compact([
+        titleMarks(v.journal, "journal"),
+        clean(v.volume) && `${clean(v.volume)}권`,
+        clean(v.issue) && `${clean(v.issue)}호`
+      ], " ");
+    }
+
+    function accessedPart(v) {
+      return clean(v.accessed) ? `접속 ${clean(v.accessed)}` : "";
+    }
+
+    const footnoteFormatters = {
+      book(v) {
+        const pub = publicationInfo(v);
+        return sentence(`${compact([clean(v.author), titleMarks(v.title, "book")])}${pub ? ` (${pub})` : ""}${pagePart(v.pages)}`);
+      },
+      article(v) {
+        const year = clean(v.year) ? `(${clean(v.year)})` : "";
+        return sentence(compact([
+          clean(v.author),
+          titleMarks(v.title, "article"),
+          compact([articleIssue(v), year], " "),
+          clean(v.pages) && `${clean(v.pages)}쪽`,
+          clean(v.doi)
+        ]));
+      },
+      thesis(v) {
+        const thesisInfo = compact([clean(v.degree), clean(v.university), clean(v.year)]);
+        return sentence(compact([
+          `${compact([clean(v.author), titleMarks(v.title, "article")])}${thesisInfo ? ` (${thesisInfo})` : ""}${pagePart(v.pages)}`,
+          clean(v.url)
+        ]));
+      },
+      newspaper(v) {
+        return sentence(compact([
+          clean(v.author),
+          titleMarks(v.title, "article"),
+          clean(v.newspaper),
+          clean(v.date),
+          clean(v.pages) && `${clean(v.pages)}면`,
+          clean(v.url)
+        ]));
+      },
+      other(v) {
+        return sentence(compact([
+          clean(v.author),
+          titleMarks(v.title, "article"),
+          clean(v.container),
+          clean(v.date),
+          accessedPart(v),
+          clean(v.url)
+        ]));
+      }
+    };
+
+    const bibliographyFormatters = {
+      book(v) {
+        const pub = publicationInfo(v);
+        return sentence(compact([
+          clean(v.author) && `${clean(v.author)}.`,
+          titleMarks(v.title, "book") && `${titleMarks(v.title, "book")}.`,
+          pub
+        ], " "));
+      },
+      article(v) {
+        const year = clean(v.year) ? `(${clean(v.year)})` : "";
+        const pages = clean(v.pageRange) ? `${clean(v.pageRange)}쪽` : "";
+        return sentence(compact([
+          clean(v.author) && `${clean(v.author)}.`,
+          titleMarks(v.title, "article") && `${titleMarks(v.title, "article")}.`,
+          compact([articleIssue(v), year], " "),
+          pages,
+          clean(v.doi)
+        ], " "));
+      },
+      thesis(v) {
+        return sentence(compact([
+          clean(v.author) && `${clean(v.author)}.`,
+          titleMarks(v.title, "article") && `${titleMarks(v.title, "article")}.`,
+          compact([clean(v.degree), clean(v.university), clean(v.year)], ", "),
+          clean(v.url)
+        ], " "));
+      },
+      newspaper(v) {
+        return sentence(compact([
+          clean(v.author) && `${clean(v.author)}.`,
+          titleMarks(v.title, "article") && `${titleMarks(v.title, "article")}.`,
+          clean(v.newspaper),
+          clean(v.date),
+          clean(v.url)
+        ], " "));
+      },
+      other(v) {
+        const access = clean(v.accessed) ? `접속 ${clean(v.accessed)}` : "";
+        return sentence(compact([
+          clean(v.author) && `${clean(v.author)}.`,
+          titleMarks(v.title, "article") && `${titleMarks(v.title, "article")}.`,
+          clean(v.container),
+          clean(v.date),
+          access,
+          clean(v.url)
+        ], " "));
+      }
+    };
+
+    function currentValues() {
+      const formData = new FormData(document.querySelector("#citationForm"));
+      return Object.fromEntries(formData.entries());
+    }
+
+    function hasAnyValue(values) {
+      return Object.values(values || {}).some(clean);
+    }
+
+    function setOutput(element, text, emptyText, hasContent) {
+      element.textContent = hasContent ? text : emptyText;
+      element.classList.toggle("empty", !hasContent);
+    }
+
+    function updateOutput() {
+      state.values[state.type] = currentValues();
+      const values = state.values[state.type];
+      const hasContent = hasAnyValue(values);
+      setOutput(
+        footnoteOutputEl,
+        footnoteFormatters[state.type](values),
+        "왼쪽에 서지 사항을 입력하면 각주가 표시됩니다.",
+        hasContent
+      );
+      setOutput(
+        bibliographyOutputEl,
+        bibliographyFormatters[state.type](values),
+        "왼쪽에 서지 사항을 입력하면 참고문헌 항목이 표시됩니다.",
+        hasContent
+      );
+      toastEl.textContent = "";
+    }
+
+    function renderFields() {
+      const type = sourceTypes[state.type];
+      const saved = state.values[state.type] || {};
+      formTitleEl.textContent = type.title;
+      typeHintEl.textContent = type.hint;
+      fieldsEl.innerHTML = "";
+
+      type.fields.forEach(([name, label, placeholder]) => {
+        const labelEl = document.createElement("label");
+        if (["doi", "url", "pageRange"].includes(name)) labelEl.className = "span-2";
+        labelEl.textContent = label;
+
+        const input = document.createElement("input");
+        input.name = name;
+        input.placeholder = placeholder;
+        input.value = saved[name] || "";
+        input.addEventListener("input", updateOutput);
+
+        labelEl.append(input);
+        fieldsEl.append(labelEl);
+      });
+
+      updateOutput();
+    }
+
+    function copyText(text, empty, successMessage) {
+      if (empty) {
+        toastEl.textContent = "복사할 내용이 아직 없습니다.";
+        return;
+      }
+      navigator.clipboard.writeText(text)
+        .then(() => {
+          toastEl.textContent = successMessage;
+        })
+        .catch(() => {
+          toastEl.textContent = "복사가 막혔습니다. 결과 문장을 직접 선택해 복사하세요.";
+        });
+    }
+
+    document.querySelectorAll(".tab").forEach((button) => {
+      button.addEventListener("click", () => {
+        state.values[state.type] = currentValues();
+        state.type = button.dataset.type;
+        document.querySelectorAll(".tab").forEach((tab) => {
+          tab.setAttribute("aria-selected", String(tab === button));
+        });
+        renderFields();
+      });
+    });
+
+    document.querySelector("#copyFootnoteBtn").addEventListener("click", () => {
+      copyText(footnoteOutputEl.textContent, footnoteOutputEl.classList.contains("empty"), "각주를 복사했습니다.");
+    });
+
+    document.querySelector("#copyBibliographyBtn").addEventListener("click", () => {
+      copyText(bibliographyOutputEl.textContent, bibliographyOutputEl.classList.contains("empty"), "참고문헌을 복사했습니다.");
+    });
+
+    document.querySelector("#exampleBtn").addEventListener("click", () => {
+      state.values[state.type] = { ...sourceTypes[state.type].example };
+      renderFields();
+      toastEl.textContent = "예시를 넣었습니다.";
+    });
+
+    document.querySelector("#clearBtn").addEventListener("click", () => {
+      state.values[state.type] = {};
+      renderFields();
+      toastEl.textContent = "입력값을 지웠습니다.";
+    });
+
+    renderFields();
+  </script>
+</body>
+</html>

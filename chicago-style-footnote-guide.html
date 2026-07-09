@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>시카고 스타일 각주 작성 지침</title>
+  <style>
+    :root {
+      --bg: #f7f4ee;
+      --paper: #fffaf2;
+      --text: #22201c;
+      --muted: #6d665c;
+      --line: #ddd3c4;
+      --accent: #2f6f62;
+      --warn: #8a4b18;
+      font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.75;
+    }
+
+    main {
+      width: min(920px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 36px 0 52px;
+    }
+
+    article {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: clamp(22px, 4vw, 38px);
+      box-shadow: 0 18px 45px rgba(62, 48, 27, .12);
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(1.8rem, 4vw, 2.65rem);
+      letter-spacing: 0;
+      line-height: 1.25;
+    }
+
+    h2 {
+      margin: 32px 0 10px;
+      font-size: 1.28rem;
+    }
+
+    h3 {
+      margin: 22px 0 8px;
+      font-size: 1.05rem;
+    }
+
+    p {
+      margin: 0 0 12px;
+    }
+
+    .lead {
+      color: var(--muted);
+      font-size: 1.03rem;
+    }
+
+    a {
+      color: var(--accent);
+      font-weight: 800;
+    }
+
+    .back {
+      display: inline-flex;
+      margin-bottom: 16px;
+      text-decoration: none;
+    }
+
+    .box {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 14px 16px;
+      margin: 12px 0;
+    }
+
+    code {
+      display: block;
+      white-space: pre-wrap;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-family: "D2Coding", Consolas, monospace;
+      line-height: 1.65;
+    }
+
+    ul {
+      padding-left: 1.25rem;
+      margin: 8px 0 16px;
+    }
+
+    li {
+      margin: 4px 0;
+    }
+
+    strong {
+      color: var(--warn);
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <a class="back" href="chicago-footnote-generator.html">← 생성기로 돌아가기</a>
+    <article>
+      <h1>시카고 스타일 각주 작성 지침</h1>
+      <p class="lead">이 문서는 대학 글쓰기 과제에서 자주 쓰는 자료 유형을 기준으로, 시카고 스타일 Notes and Bibliography 방식의 각주와 참고문헌 작성 순서를 간단히 정리한 것입니다.</p>
+
+      <h2>1. 기본 원칙</h2>
+      <ul>
+        <li>각주는 본문에서 인용하거나 참고한 바로 그 위치에 붙입니다.</li>
+        <li>첫 각주는 저자, 제목, 출판 정보, 인용 쪽수까지 비교적 자세히 씁니다.</li>
+        <li>참고문헌은 글 끝에 모아 쓰며, 특정 인용 쪽수보다 자료 전체의 서지 정보를 적습니다.</li>
+        <li>온라인 자료는 DOI가 있으면 DOI를 우선 쓰고, DOI가 없으면 URL이나 이용한 데이터베이스명을 씁니다.</li>
+        <li>작성자, 발행일, 쪽수처럼 확인되지 않는 정보는 임의로 만들지 말고 비워 두거나 추가 확인합니다.</li>
+      </ul>
+
+      <div class="box">
+        <p><strong>주의:</strong> 시카고 스타일은 영문권 표기 관행을 기준으로 하므로, 한국어 과제에서는 교수자 지침에 따라 『책 제목』, 「논문 제목」 같은 한국어 표기 관행을 함께 적용할 수 있습니다.</p>
+      </div>
+
+      <h2>2. 자료 유형별 기본 순서</h2>
+
+      <h3>단행본</h3>
+      <p>각주에는 인용한 쪽수를 넣고, 참고문헌에는 책 전체 정보를 적습니다.</p>
+      <code>각주: 저자, 『책 제목』 (출판지: 출판사, 연도), 쪽수.
+참고문헌: 저자. 『책 제목』. 출판지: 출판사, 연도.</code>
+
+      <h3>학술논문</h3>
+      <p>각주에는 인용 쪽수, 참고문헌에는 논문 전체 쪽수 범위를 쓰는 것이 좋습니다.</p>
+      <code>각주: 저자, 「논문 제목」, 『학술지명』 권 호 (연도), 인용 쪽수, DOI/URL.
+참고문헌: 저자. 「논문 제목」. 『학술지명』 권 호 (연도), 전체 쪽수. DOI/URL.</code>
+
+      <h3>학위논문</h3>
+      <p>학위 종류, 대학명, 수여연도를 함께 적습니다.</p>
+      <code>각주: 저자, 「논문 제목」 (학위논문, 대학명, 연도), 쪽수.
+참고문헌: 저자. 「논문 제목」. 학위논문, 대학명, 연도.</code>
+
+      <h3>신문 자료</h3>
+      <p>신문 기사와 온라인 뉴스는 기사 제목, 매체명, 발행일을 중심으로 확인합니다. 온라인 기사라면 URL을 함께 적습니다.</p>
+      <code>각주: 기자명, 「기사 제목」, 신문/매체명, 발행일, 쪽수 또는 URL.
+참고문헌: 기자명. 「기사 제목」. 신문/매체명, 발행일. URL.</code>
+
+      <h3>기타 웹 자료</h3>
+      <p>작성일이나 수정일이 있으면 그것을 쓰고, 날짜가 확인되지 않으면 접속일을 넣습니다.</p>
+      <code>각주: 작성자/기관, 「자료 제목」, 사이트명/발행기관, 작성일, 접속일, URL.
+참고문헌: 작성자/기관. 「자료 제목」. 사이트명/발행기관. 작성일. 접속일. URL.</code>
+
+      <h2>3. 제출 전 확인 목록</h2>
+      <ul>
+        <li>본문의 모든 직접 인용, 통계, 주장 근거에 각주가 붙어 있는지 확인합니다.</li>
+        <li>각주와 참고문헌의 저자명, 제목, 발행연도, 쪽수가 서로 맞는지 확인합니다.</li>
+        <li>인터넷 주소는 실제로 열리는지 확인합니다.</li>
+        <li>RISS, KCI, 국립중앙도서관, Google Scholar 등에서 서지 정보가 실제로 확인되는지 점검합니다.</li>
+        <li>출처를 찾을 수 없거나 정보가 불확실하면 임의로 채우지 말고 “추가 확인 필요”로 표시합니다.</li>
+      </ul>
+
+      <h2>4. 참고한 기준</h2>
+      <p>이 지침은 The Chicago Manual of Style Online의 <a href="https://www.chicagomanualofstyle.org/tools_citationguide/citation-guide-1.html" target="_blank" rel="noopener">Notes and Bibliography: Sample Citations</a>를 바탕으로, 한국어 글쓰기 과제에서 쓰기 쉽도록 간단히 정리한 것입니다.</p>
+    </article>
+  </main>
+</body>
+</html>
